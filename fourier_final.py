@@ -1,19 +1,19 @@
 from manim import *
 
-scale_factor = 1
+scale_down = 3535 / 2
 
 def multivecdefiner(arramp,arrang,arrvecs,arrcirc,ind):
     if ind==0:
-        vec = FourierVector(np.array([arramp[ind]/scale_factor,0,0]), buff = 0.0, max_tip_length_to_length_ratio = 0.1, color=WHITE)
-        arrcirc.append(Circle(radius = arramp[ind]/scale_factor, stroke_width=0.25, color=WHITE))
+        vec = FourierVector(np.array([arramp[ind]/scale_down,0,0]), buff = 0.0, max_tip_length_to_length_ratio = 0.1, color=WHITE)
+        arrcirc.append(Circle(radius = arramp[ind]/scale_down, stroke_width=0.25, color=WHITE))
         vec.set_angle(arrang[ind])
         arrvecs.append(vec)
 
         multivecdefiner(arramp,arrang,arrvecs,arrcirc,ind+1)
 
     elif ind>0 and ind<len(arramp)-1:
-        vec = FourierVector(np.array([arramp[ind]/scale_factor,0,0]), buff = 0.0, max_tip_length_to_length_ratio = 0.1, color=WHITE)
-        arrcirc.append(Circle(radius = arramp[ind]/scale_factor, stroke_width=0.25, color=WHITE))
+        vec = FourierVector(np.array([arramp[ind]/scale_down,0,0]), buff = 0.0, max_tip_length_to_length_ratio = 0.1, color=WHITE)
+        arrcirc.append(Circle(radius = arramp[ind]/scale_down, stroke_width=0.25, color=WHITE))
         vec.set_angle(arrang[ind])
         arrvecs.append(vec)
         vec.move_to(arrvecs[ind-1].get_end()+ 0.5*arrvecs[ind].get_complete_vector())
@@ -21,8 +21,8 @@ def multivecdefiner(arramp,arrang,arrvecs,arrcirc,ind):
         multivecdefiner(arramp,arrang,arrvecs,arrcirc,ind+1)
 
     else:
-        vec = FourierVector(np.array([arramp[ind]/scale_factor,0,0]), buff = 0.0, max_tip_length_to_length_ratio = 0.1, color=WHITE)
-        arrcirc.append(Circle(radius = arramp[ind]/scale_factor, stroke_width=0.25, color=WHITE))
+        vec = FourierVector(np.array([arramp[ind]/scale_down,0,0]), buff = 0.0, max_tip_length_to_length_ratio = 0.1, color=WHITE)
+        arrcirc.append(Circle(radius = arramp[ind]/scale_down, stroke_width=0.25, color=WHITE))
         vec.set_angle(arrang[ind])
         arrvecs.append(vec)
         vec.move_to(arrvecs[ind-1].get_end()+ 0.5*arrvecs[ind].get_complete_vector())
@@ -42,19 +42,25 @@ def multivecupdater(vecarr,circarr,ind,arrang,arrfreq,tracker):
         # circarr[ind].add_updater(lambda m : m.move_to(vecarr[ind-1].get_end()))
 
 
-vecarr = [[2,0,1],[1.5,PI/4,-1]]
-rev_vecarr= vecarr[::-1]
-print(rev_vecarr)
+# vecarr = [[2,0,1],[1.5,PI/4,-1]]
+filename = 'triangle.csv'
+with open(filename, 'rt') as raw_data:
+    vecarr = np.loadtxt(raw_data, delimiter=",")
+
 n = len(vecarr)
 
-amp=[]
-phang=[]
-freq=[]
+amp = np.ndarray.tolist(vecarr[:, 0])
+phang = np.ndarray.tolist(vecarr[:, 1])
+freq = np.ndarray.tolist(vecarr[:, 2])
 
-for i in range(n):
-    amp.append(rev_vecarr[i][0])
-    phang.append(rev_vecarr[i][1])
-    freq.append(rev_vecarr[i][2])
+print(f'amp: {amp}')
+print(f'phang: {phang}')
+print(f'freq: {freq}')
+
+# for i in range(n):
+#     amp.append(rev_vecarr[i][0])
+#     phang.append(rev_vecarr[i][1])
+#     freq.append(rev_vecarr[i][2])
 
 class FourierVector(Vector):
     def get_complete_vector(self):
@@ -81,10 +87,8 @@ class Fourier(Scene):
         VT = ValueTracker(0)
 
         multivecdefiner(amp,phang,vecs,circs,0)
-        print(vecs[-1].get_end())
 
         multivecupdater(vecs,circs,len(vecs)-1,phang,freq,VT)
-        print(vecs[-1].get_end())
 
 
         path = VMobject(color=WHITE)
